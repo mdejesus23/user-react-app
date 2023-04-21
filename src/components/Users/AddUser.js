@@ -2,11 +2,13 @@ import React, { useState } from "react";
 
 import Card from "../UI/Card";
 import Button from "../UI/Button";
+import ListUser from "./ListUser";
 import classes from "./AddUser.module.css";
 
 const AddUser = (props) => {
   const [enteredUsername, setEnteredUsername] = useState("");
   const [enteredAge, setEnteredAge] = useState("");
+  const [listOfUser, setListOfUser] = useState([]);
 
   const addUserHandler = (event) => {
     event.preventDefault();
@@ -14,6 +16,8 @@ const AddUser = (props) => {
     if (enteredUsername.trim().length === 0) {
       return;
     } else if (enteredAge.trim().length === 0 || +enteredAge < 5) {
+      // +enteredAge convert string to number data type.
+
       return;
     }
 
@@ -49,6 +53,7 @@ const AddUser = (props) => {
         />
         <Button type="submit">Add User</Button>
       </form>
+      <ListUser userList={listOfUser} />
     </Card>
   );
 };
