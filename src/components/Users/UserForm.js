@@ -9,17 +9,23 @@ import classes from "./UserForm.module.css";
 const UserForm = (props) => {
   const [enteredUsername, setEnteredUsername] = useState("");
   const [enteredAge, setEnteredAge] = useState("");
-  const [isValid, setIsValid] = useState(true);
+  const [error, setError] = useState(undefined);
 
   const addUserHandler = (event) => {
     event.preventDefault(); // code to avoid reloading the whole web page.
 
-    if (enteredUsername.trim().length === 0) {
-      setIsValid(false);
+    if (enteredUsername.trim().length === 0 || enteredAge.trim().length === 0) {
+      setError({
+        title: "Invalid Input",
+        message: "Please enter a valid name and age (not an empty values).",
+      });
       return;
-    } else if (enteredAge.trim().length === 0 || +enteredAge < 5) {
       // +enteredAge convert string to number data type.
-      setIsValid(false);
+    } else if (+enteredAge < 5) {
+      setError({
+        title: "Invalid age",
+        message: "Please enter a valid age (> 0).",
+      });
       return;
     }
 
@@ -33,10 +39,6 @@ const UserForm = (props) => {
     setEnteredAge("");
   };
 
-  const isValidChangeHandler = (show) => {
-    setIsValid(isValid === show);
-  };
-
   const usernameChangeHandler = (event) => {
     setEnteredUsername(event.target.value);
   };
@@ -45,10 +47,18 @@ const UserForm = (props) => {
     setEnteredAge(event.target.value);
   };
 
+  const errorHandler = () => setError(undefined);
+
   return (
     <Card className={classes.input}>
-      {isValid === false && <ErrorModal />}
-      {isValid === true && (
+      {error && ( // if error is an object? render ErrorModal component
+        <ErrorModal
+          title={error.title}
+          message={error.message}
+          onCloseModal={errorHandler}
+        />
+      )}
+      {error === undefined && ( // if error is undefined? render UserForm component.
         <form onSubmit={addUserHandler}>
           <label htmlFor="username">Username</label>
           <input
