@@ -1,27 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 
 import Card from "../UI/Card";
 import Button from "../UI/Button";
+import Wrapper from "../Helpers/Wrapper";
 import ErrorModal from "../Modal/ErrorModal";
 
 import classes from "./UserForm.module.css";
 
 const UserForm = (props) => {
-  const [enteredUsername, setEnteredUsername] = useState("");
-  const [enteredAge, setEnteredAge] = useState("");
+  // we're using useRef instead of a useState to get the value of the user input.
+  const nameInputRef = useRef();
+  const ageInputRef = useRef();
+
   const [error, setError] = useState(undefined);
 
   const addUserHandler = (event) => {
     event.preventDefault(); // code to avoid reloading the whole web page.
+    const enteredName = nameInputRef.current.value;
+    const enteredUserAge = ageInputRef.current.value;
 
-    if (enteredUsername.trim().length === 0 || enteredAge.trim().length === 0) {
+    if (enteredName.trim().length === 0 || enteredUserAge.trim().length === 0) {
       setError({
         title: "Invalid Input",
         message: "Please enter a valid name and age (not an empty values).",
       });
       return;
       // +enteredAge convert string to number data type.
-    } else if (+enteredAge < 5) {
+    } else if (+enteredUserAge < 5) {
       setError({
         title: "Invalid age",
         message: "Please enter a valid age (> 0).",
@@ -30,27 +35,19 @@ const UserForm = (props) => {
     }
 
     const userData = {
-      username: enteredUsername,
-      userAge: enteredAge,
+      username: enteredName,
+      userAge: enteredUserAge,
     };
 
     props.onSaveUserList(userData);
-    setEnteredUsername("");
-    setEnteredAge("");
-  };
-
-  const usernameChangeHandler = (event) => {
-    setEnteredUsername(event.target.value);
-  };
-
-  const ageChangeHandler = (event) => {
-    setEnteredAge(event.target.value);
+    nameInputRef.current.value = "";
+    ageInputRef.current.value = "";
   };
 
   const errorHandler = () => setError(undefined);
 
   return (
-    <Card className={classes.input}>
+    <Wrapper>
       {error && ( // if error is an object? render ErrorModal component
         <ErrorModal
           title={error.title}
@@ -58,26 +55,18 @@ const UserForm = (props) => {
           onCloseModal={errorHandler}
         />
       )}
-      {error === undefined && ( // if error is undefined? render UserForm component.
-        <form onSubmit={addUserHandler}>
-          <label htmlFor="username">Username</label>
-          <input
-            id="username"
-            type="text"
-            onChange={usernameChangeHandler}
-            value={enteredUsername}
-          />
-          <label htmlFor="age">Age (Years)</label>
-          <input
-            id="age"
-            type="number"
-            onChange={ageChangeHandler}
-            value={enteredAge}
-          />
-          <Button type="submit">Add User</Button>
-        </form>
-      )}
-    </Card>
+      <Card className={classes.input}>
+        {error === undefined && ( // if error is undefined? render UserForm component.
+          <form onSubmit={addUserHandler}>
+            <label htmlFor="username">Username</label>
+            <input id="username" type="text" ref={nameInputRef} />
+            <label htmlFor="age">Age (Years)</label>
+            <input id="age" type="number" ref={ageInputRef} />
+            <Button type="submit">Add User</Button>
+          </form>
+        )}
+      </Card>
+    </Wrapper>
   );
 };
 

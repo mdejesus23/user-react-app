@@ -1,26 +1,48 @@
 import React from "react";
+import ReactDom from "react-dom";
 
 import Card from "../UI/Card";
 import Button from "../UI/Button";
 
 import classes from "./ErrorModal.module.css";
 
+const Backdrop = (props) => {
+  return <div className={classes.backdrop} onClick={props.onConfirm} />;
+};
+
+const ModalOverlay = (props) => {
+  return (
+    <Card className={classes.modal}>
+      <header className={classes.header}>
+        <h2>{props.title}</h2>
+      </header>
+      <div className={classes.content}>
+        <p>{props.message}</p>
+      </div>
+      <footer className={classes.actions}>
+        <Button onClick={props.onConfirm}>Okay</Button>
+      </footer>
+    </Card>
+  );
+};
+
 const ErrorModal = (props) => {
   return (
     // using props to pass errorHandler from useForm parent element to ErrorModal child element.
-    <div className={classes.backdrop} onClick={props.onCloseModal}>
-      <Card className={classes.modal}>
-        <header className={classes.header}>
-          <h2>{props.title}</h2>
-        </header>
-        <div className={classes.content}>
-          <p>{props.message}</p>
-        </div>
-        <footer className={classes.actions}>
-          <Button onClick={props.onCloseModal}>Okay</Button>
-        </footer>
-      </Card>
-    </div>
+    <>
+      {ReactDom.createPortal(
+        <Backdrop onConfirm={props.onCloseModal} />,
+        document.getElementById("backdrop-root")
+      )}
+      {ReactDom.createPortal(
+        <ModalOverlay
+          title={props.title}
+          message={props.message}
+          onConfirm={props.onCloseModal}
+        />,
+        document.getElementById("modal-root")
+      )}
+    </>
   );
 };
 
